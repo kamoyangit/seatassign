@@ -6,8 +6,11 @@ import os
 
 # パスワードの確認
 def check_password():
+    # 環境変数を取得
+    PASSWD = os.environ.get('PASS_KEY')
+
     password = st.text_input("パスワードを入力してください", type="password")
-    if password == "dih2024":
+    if password == PASSWD:
         return True
     else:
         return False
