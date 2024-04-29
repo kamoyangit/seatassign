@@ -64,19 +64,17 @@ def main():
         # st.write('割り当てられた座席: ', seats['assigned'])
 
         # デバッグ用：昨日の日付を管理ファイルに書き込むボタン
-        '''
-        st.write(f'---------')
-        st.write(f'デバッグ用')
-        if st.button("昨日の日付を書き込む"):
-            seats = load_state()
-            # 現在の日付情報を取得
-            current_date = datetime.now().date()
-            # 1日前の日付情報を計算
-            yesterday = current_date - timedelta(days=1)
-            seats = {'date': yesterday, 'assigned': seats['assigned']}
-            st.write(f'書き込んだ日付は{yesterday}')
-            save_state(seats)
-            '''
+        #st.write(f'---------')
+        #st.write(f'デバッグ用')
+        #if st.button("昨日の日付を書き込む"):
+        #    seats = load_state()
+        #    # 現在の日付情報を取得
+        #    current_date = datetime.now().date()
+        #    # 1日前の日付情報を計算
+        #    yesterday = current_date - timedelta(days=1)
+        #    seats = {'date': yesterday, 'assigned': seats['assigned']}
+        #    st.write(f'書き込んだ日付は{yesterday}')
+        #    save_state(seats)
 
 if __name__ == "__main__":
     main()
