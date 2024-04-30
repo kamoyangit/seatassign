@@ -3,6 +3,7 @@ import random
 from datetime import datetime, timedelta
 import pickle
 import os
+import pytz
 
 # パスワードの確認
 def check_password():
@@ -31,12 +32,17 @@ def main():
     # アプリのタイトル表示
     st.title('座席割り当てアプリ')
 
+    # 日本のタイムゾーンを指定
+    jst = pytz.timezone('Asia/Tokyo')
+
     if check_password():
         total_seats = 15  # 例として座席数を15に設定
         seats = load_state()
 
         # 日付が変わったら、座席をリセット
-        current_date = datetime.now().date()
+        # current_date = datetime.now().date()
+        # タイムゾーンを指定する
+        current_date = datetime.now(jst).date()
         if seats is None or seats['date'] != current_date:
             seats = {'date': current_date, 'assigned': []}
 
@@ -70,6 +76,8 @@ def main():
         #    seats = load_state()
         #    # 現在の日付情報を取得
         #    current_date = datetime.now().date()
+        #    # タイムゾーンを指定する
+        #    current_date = datetime.now(jst).date()
         #    # 1日前の日付情報を計算
         #    yesterday = current_date - timedelta(days=1)
         #    seats = {'date': yesterday, 'assigned': seats['assigned']}
