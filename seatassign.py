@@ -4,9 +4,18 @@ from datetime import datetime, timedelta
 import pickle
 import os
 import pytz
+from PIL import Image
+from pathlib import Path
 
 # 日本のタイムゾーンを指定
 jst = pytz.timezone('Asia/Tokyo')
+
+# 画像ファイル名
+default_image_filename = 'AAA.png'
+private_image_filename = 'BBB.png'
+
+# 最大座席数
+max_seats = 15
 
 # パスワードの確認
 def check_password():
@@ -31,6 +40,40 @@ def save_state(seats):
     with open('seats.pkl', 'wb') as f:
         pickle.dump(seats, f)
 
+def image_uploader():
+    # 画像ファイルのアップローダー
+    uploaded_file = st.file_uploader("画像ファイル(BBB.png)を選択して下さい", type=['png'])
+
+    # ファイルがアップロードされた場合、画像を表示
+    if uploaded_file is not None:
+        # PILを使用して画像を読み込み
+        image = Image.open(uploaded_file)
+    
+        # Streamlitで画像を表示
+        # st.image(image, caption='アップロードされた画像', use_column_width=True)
+
+        # 保存先のディレクトリを指定
+        save_path = '.'
+        if not os.path.exists(save_path):
+            os.makedirs(save_path)
+    
+        # 保存するファイル名を指定（オリジナルのファイル名を使用）
+        file_path = os.path.join(save_path, uploaded_file.name)
+    
+        # 画像を保存
+        image.save(file_path)
+    
+        # 保存したことをユーザーに通知
+        # st.success(f"画像が保存されました: {file_path}")
+        st.success(f"画像を保存しました")
+
+def max_seats_update():
+    seats = load_state()
+    new_max_seats = st.number_input("最大座席数を入力して下さい", min_value=2, max_value=1000, value=seats['seatsnum'], step=1)
+    if st.button("座席数の更新"):
+        seats['seatsnum'] = new_max_seats
+        save_state(seats)
+
 # Adminパスワードの確認
 def check_password_admin():
     # 環境変数を取得
@@ -44,10 +87,11 @@ def check_password_admin():
 
 def admin_main():
     if check_password_admin():
-        total_seats = 15  # 例として座席数を15に設定
+        st.write(f'---------')
         seats = load_state()
-        if seats == None:
+        if seats['assigned'] == "":
             return
+        total_seats = seats['seatsnum']
         # 指定した番号の席の割り当てを開放する
         st.write(f'指定した座席割り当て席の番号を開放します')
         delete_seat = st.selectbox(
@@ -65,7 +109,15 @@ def admin_main():
             else:
                 st.error(f'開放する席はありません')
     
-    # デバッグ用：昨日の日付を管理ファイルに書き込むボタン
+        # イメージのアップロード処理
+        st.write(f'---------')
+        image_uploader()
+
+        # 座席数の更新処理
+        st.write(f'---------')
+        max_seats_update()
+
+        # デバッグ用：昨日の日付を管理ファイルに書き込むボタン
         st.write(f'---------')
         st.write(f'デバッグ用')
         if st.button("昨日の日付を書き込む"):
@@ -73,9 +125,10 @@ def admin_main():
             # 現在の日付情報を取得
             # current_date = datetime.now().date()
             current_date = datetime.now(jst).date()
+            current_max_seats = total_seats
             # 1日前の日付情報を計算
             yesterday = current_date - timedelta(days=1)
-            seats = {'date': yesterday, 'assigned': seats['assigned']}
+            seats = {'date': yesterday, 'seatsnum': current_max_seats,'assigned': seats['assigned']}
             st.write(f'書き込んだ日付は{yesterday}')
             save_state(seats)
 
@@ -84,18 +137,26 @@ def main():
     st.title('座席割り当てアプリ')
 
     if check_password():
-        total_seats = 15  # 例として座席数を15に設定
         seats = load_state()
+        if seats is None:
+            total_seats = max_seats
+        else:
+            total_seats = seats['seatsnum']
 
         # 日付が変わったら、座席をリセット
         # current_date = datetime.now().date()
         # タイムゾーンを指定する
         current_date = datetime.now(jst).date()
+        current_max_seats = total_seats
         if seats is None or seats['date'] != current_date:
-            seats = {'date': current_date, 'assigned': []}
+            seats = {'date': current_date, 'seatsnum': current_max_seats,'assigned': []}
 
         # 座席図の表示
-        st.image('AAA.png', caption='座席割り当て図', width=300)
+        # st.image('AAA.png', caption='座席割り当て図', width=300)
+        if Path(private_image_filename).exists():
+            st.image(private_image_filename, caption='座席割り当て図', width=300)
+        else:
+            st.image(default_image_filename, caption='座席割り当て図', width=300)
         
         # 注意の文言
         st.write(f'座席割り当てのボタンは1回だけ押してください')
