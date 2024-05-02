@@ -89,8 +89,9 @@ def admin_main():
     if check_password_admin():
         st.write(f'---------')
         seats = load_state()
-        if seats['assigned'] == "":
-            return
+        if seats is None:
+             st.write(f'管理対象のデータがありません')
+             return
         total_seats = seats['seatsnum']
         # 指定した番号の席の割り当てを開放する
         st.write(f'指定した座席割り当て席の番号を開放します')
@@ -125,7 +126,7 @@ def admin_main():
             # 現在の日付情報を取得
             # current_date = datetime.now().date()
             current_date = datetime.now(jst).date()
-            current_max_seats = total_seats
+            current_max_seats = seats['seatsnum']
             # 1日前の日付情報を計算
             yesterday = current_date - timedelta(days=1)
             seats = {'date': yesterday, 'seatsnum': current_max_seats,'assigned': seats['assigned']}
