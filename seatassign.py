@@ -100,6 +100,8 @@ def admin_main():
             (seats["assigned"]))
         # st.write('開放する席の番号', delete_seat)
         if st.button('座席を開放する'):
+            # フェールセーフ
+            seats = load_state()
             available_seats = list(set(range(1, total_seats + 1)) - set(seats['assigned']))
             if delete_seat in seats['assigned']:
                 seats['assigned'].remove(delete_seat)
