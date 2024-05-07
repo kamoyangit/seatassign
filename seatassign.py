@@ -151,6 +151,8 @@ def main():
         current_max_seats = total_seats
         if seats is None or seats['date'] != current_date:
             seats = {'date': current_date, 'seatsnum': current_max_seats,'assigned': []}
+            # フェールセーフ
+            save_state(seats) 
 
         # 座席図の表示
         # st.image('AAA.png', caption='座席割り当て図', width=300)
@@ -163,6 +165,8 @@ def main():
         st.write(f'座席割り当てのボタンは1回だけ押してください')
 
         if st.button('座席を割り当てる'):
+            # フェールセーフ
+            seats = load_state()
             available_seats = list(set(range(1, total_seats + 1)) - set(seats['assigned']))
             if available_seats:
                 assigned_seat = random.choice(available_seats)
