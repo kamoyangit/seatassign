@@ -71,7 +71,13 @@ def max_seats_update():
     seats = load_state()
     new_max_seats = st.number_input("最大座席数を入力して下さい", min_value=2, max_value=1000, value=seats['seatsnum'], step=1)
     if st.button("座席数の更新"):
-        seats['seatsnum'] = new_max_seats
+        # Bugfix
+        # タイムゾーンを指定する
+        current_date = datetime.now(jst).date()
+        if seats['seatsnum'] > new_max_seats:
+            seats = {'date': current_date, 'seatsnum': new_max_seats,'assigned': []}
+        else:
+            seats['seatsnum'] = new_max_seats
         save_state(seats)
 
 # Adminパスワードの確認
@@ -102,6 +108,7 @@ def admin_main():
         if st.button('座席を開放する'):
             # フェールセーフ
             seats = load_state()
+            total_seats = seats['seatsnum']
             available_seats = list(set(range(1, total_seats + 1)) - set(seats['assigned']))
             if delete_seat in seats['assigned']:
                 seats['assigned'].remove(delete_seat)
@@ -169,6 +176,7 @@ def main():
         if st.button('座席を割り当てる'):
             # フェールセーフ
             seats = load_state()
+            total_seats = seats['seatsnum']
             available_seats = list(set(range(1, total_seats + 1)) - set(seats['assigned']))
             if available_seats:
                 assigned_seat = random.choice(available_seats)
