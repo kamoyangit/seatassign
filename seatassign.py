@@ -28,6 +28,17 @@ def check_password():
     else:
         return False
 
+# パスワードの確認
+def check_password2():
+    # 環境変数を取得
+    PASSWD2 = os.environ.get('PASS_KEY')
+
+    password2 = st.text_input("座席開放用（誤って複数座席を取得した場合は、不要な座席を開放して下さい）", type="password")
+    if password2 == PASSWD2:
+        return True
+    else:
+        return False
+
 def load_state():
     try:
         with open('seats.pkl', 'rb') as f:
@@ -85,7 +96,7 @@ def check_password_admin():
     # 環境変数を取得
     PASSWDADMIN = os.environ.get('ADMIN_KEY')
 
-    passwordadmin = st.text_input("管理者用", type="password")
+    passwordadmin = st.text_input("管理者用（一般ユーザの方はこの機能は使わないで下さい）", type="password")
     if passwordadmin == PASSWDADMIN:
         return True
     else:
@@ -93,7 +104,7 @@ def check_password_admin():
 
 def admin_main():
     if check_password_admin():
-        st.write(f'---------')
+        st.divider()
         seats = load_state()
         if seats is None:
              st.write(f'管理対象のデータがありません')
@@ -120,15 +131,15 @@ def admin_main():
                 st.error(f'開放する席はありません')
     
         # イメージのアップロード処理
-        st.write(f'---------')
+        st.divider()
         image_uploader()
 
         # 座席数の更新処理
-        st.write(f'---------')
+        st.divider()
         max_seats_update()
 
         # デバッグ用：昨日の日付を管理ファイルに書き込むボタン
-        st.write(f'---------')
+        st.divider()
         st.write(f'デバッグ用')
         if st.button("昨日の日付を書き込む"):
             seats = load_state()
@@ -141,6 +152,33 @@ def admin_main():
             seats = {'date': yesterday, 'seatsnum': current_max_seats,'assigned': seats['assigned']}
             st.write(f'書き込んだ日付は{yesterday}')
             save_state(seats)
+
+def release_seats():
+    if check_password2():
+        seats = load_state()
+        if seats is None:
+             st.write(f'管理対象のデータがありません')
+             return
+        total_seats = seats['seatsnum']
+        # 指定した番号の席の割り当てを開放する
+        st.write(f'指定した座席割り当て席の番号を開放します')
+        delete_seat = st.selectbox(
+            '開放する席の番号',
+            (seats["assigned"]))
+        # st.write('開放する席の番号', delete_seat)
+        if st.button('座席を開放する'):
+            # フェールセーフ
+            seats = load_state()
+            total_seats = seats['seatsnum']
+            available_seats = list(set(range(1, total_seats + 1)) - set(seats['assigned']))
+            if delete_seat in seats['assigned']:
+                seats['assigned'].remove(delete_seat)
+                available_seats.append(delete_seat)
+                available_seats = list(set(available_seats))
+                st.success(f'座席番号 {delete_seat} を開放しました。')
+                save_state(seats)
+            else:
+                st.error(f'開放する席はありません')
 
 def main():
     # アプリのタイトル表示
@@ -171,9 +209,9 @@ def main():
             st.image(default_image_filename, caption='座席割り当て図', width=300)
         
         # 注意の文言
-        st.write(f'座席割り当てのボタンは1回だけ押してください')
+        st.write(f'＜座席割り当てボタン＞は、1回だけ押してください')
 
-        if st.button('座席を割り当てる'):
+        if st.button('座席割り当てボタン'):
             # フェールセーフ
             seats = load_state()
             total_seats = seats['seatsnum']
@@ -181,19 +219,21 @@ def main():
             if available_seats:
                 assigned_seat = random.choice(available_seats)
                 seats['assigned'].append(assigned_seat)
-                st.success(f'あなたの座席番号は {assigned_seat} です。')
+                st.success(f'あなたの座席番号は ＜ {assigned_seat} ＞ です。')
                 save_state(seats)
             else:
                 st.error('空きの座席はありません。')
 
-        st.write(f'現在割り当てられた座席数: {len(seats["assigned"])}')
-        st.write(f'残り座席数: {total_seats - len(seats["assigned"])}')
-        st.write(f'{current_date}')
+        st.write(f'現在の割り当て座席数: {len(seats["assigned"])}  ／  残り座席数: {total_seats - len(seats["assigned"])}')
+        # st.write(f'{current_date}')
 
         # デバッグ用：割り当てられた座席のリストを表示
         # st.write('割り当てられた座席: ', seats['assigned'])
 
-        st.write(f'---------')
+        st.divider()
+        release_seats()
+
+        st.divider()
         admin_main()
 
 if __name__ == "__main__":
