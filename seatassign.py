@@ -15,7 +15,7 @@ default_image_filename = 'AAA.png'
 private_image_filename = 'BBB.png'
 
 # 最大座席数
-max_seats = 15
+max_seats = 12
 
 # パスワードの確認
 def check_password():
