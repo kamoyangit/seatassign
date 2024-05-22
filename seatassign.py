@@ -16,6 +16,7 @@ private_image_filename = 'BBB.png'
 
 # 最大座席数
 max_seats = 12
+max_seats_nd = 4
 
 # パスワードの確認
 def check_password():
@@ -80,8 +81,8 @@ def image_uploader():
 
 def max_seats_update():
     seats = load_state()
-    new_max_seats = st.number_input("最大座席数を入力して下さい", min_value=2, max_value=1000, value=seats['seatsnum'], step=1)
-    if st.button("座席数の更新"):
+    new_max_seats = st.number_input("最大座席数【ディスプレイ付】を入力して下さい", min_value=2, max_value=1000, value=seats['seatsnum'], step=1)
+    if st.button("座席数の更新【ディスプレイ付】"):
         # Bugfix
         # タイムゾーンを指定する
         current_date = datetime.now(jst).date()
@@ -89,6 +90,19 @@ def max_seats_update():
             seats = {'date': current_date, 'seatsnum': new_max_seats,'assigned': []}
         else:
             seats['seatsnum'] = new_max_seats
+        save_state(seats)
+
+def max_seats_nd_update():
+    seats = load_state()
+    new_max_seats_nd = st.number_input("最大座席数【ディスプレイなし】を入力して下さい", min_value=2, max_value=1000, value=seats['seatsnum_nd'], step=1)
+    if st.button("座席数の更新【ディスプレイなし】"):
+        # Bugfix
+        # タイムゾーンを指定する
+        current_date = datetime.now(jst).date()
+        if seats['seatsnum_nd'] > new_max_seats_nd:
+            seats = {'date': current_date, 'seatsnum_nd': new_max_seats_nd,'assigned_nd': []}
+        else:
+            seats['seatsnum_nd'] = new_max_seats_nd
         save_state(seats)
 
 # Adminパスワードの確認
@@ -110,13 +124,16 @@ def admin_main():
              st.write(f'管理対象のデータがありません')
              return
         total_seats = seats['seatsnum']
+        total_seats_nd = seats['seatsnum_nd']
+
         # 指定した番号の席の割り当てを開放する
-        st.write(f'指定した座席割り当て席の番号を開放します')
+        st.write(f'指定した座席番号を開放します')
+
         delete_seat = st.selectbox(
-            '開放する席の番号',
+            '開放する席の番号（あり）',
             (seats["assigned"]))
         # st.write('開放する席の番号', delete_seat)
-        if st.button('座席を開放する'):
+        if st.button('【Admin】座席を開放する【ディスプレイ付】'):
             # フェールセーフ
             seats = load_state()
             total_seats = seats['seatsnum']
@@ -129,6 +146,24 @@ def admin_main():
                 save_state(seats)
             else:
                 st.error(f'開放する席はありません')
+        
+        delete_seat_nd = st.selectbox(
+            '開放する席の番号（なし）',
+            (seats["assigned_nd"]))
+        # st.write('開放する席の番号', delete_seat)
+        if st.button('【Admin】座席を開放する【ディスプレイなし】'):
+            # フェールセーフ
+            seats = load_state()
+            total_seats = seats['seatsnum_nd']
+            available_seats_nd = list(set(range(1, total_seats_nd + 1)) - set(seats['assigned_nd']))
+            if delete_seat in seats['assigned_nd']:
+                seats['assigned_nd'].remove(delete_seat_nd)
+                available_seats_nd.append(delete_seat_nd)
+                available_seats_nd = list(set(available_seats_nd))
+                st.success(f'座席番号 {delete_seat_nd} を開放しました。')
+                save_state(seats)
+            else:
+                st.error(f'開放する席はありません')
     
         # イメージのアップロード処理
         st.divider()
@@ -137,6 +172,7 @@ def admin_main():
         # 座席数の更新処理
         st.divider()
         max_seats_update()
+        max_seats_nd_update()
 
         # デバッグ用：昨日の日付を管理ファイルに書き込むボタン
         st.divider()
@@ -161,12 +197,14 @@ def release_seats():
              return
         total_seats = seats['seatsnum']
         # 指定した番号の席の割り当てを開放する
-        st.write(f'指定した座席割り当て席の番号を開放します')
+        st.write(f'指定した座席番号を開放します')
+
+        st.divider()
         delete_seat = st.selectbox(
-            '開放する席の番号',
+            '開放する席【ディスプレイ付】の番号',
             (seats["assigned"]))
         # st.write('開放する席の番号', delete_seat)
-        if st.button('座席を開放する'):
+        if st.button('座席を開放する【ディスプレイ付】'):
             # フェールセーフ
             seats = load_state()
             total_seats = seats['seatsnum']
@@ -180,6 +218,25 @@ def release_seats():
             else:
                 st.error(f'開放する席はありません')
 
+        st.divider()
+        delete_seat_nd = st.selectbox(
+            '開放する席【ディスプレイなし】の番号',
+            (seats["assigned_nd"]))
+        # st.write('開放する席の番号', delete_seat)
+        if st.button('座席を開放する【ディスプレイなし】'):
+            # フェールセーフ
+            seats = load_state()
+            total_seats_nd = seats['seatsnum_nd']
+            available_seats_nd = list(set(range(1, total_seats_nd + 1)) - set(seats['assigned_nd']))
+            if delete_seat_nd in seats['assigned_nd']:
+                seats['assigned_nd'].remove(delete_seat_nd)
+                available_seats_nd.append(delete_seat_nd)
+                available_seats_nd = list(set(available_seats_nd))
+                st.success(f'座席番号 {delete_seat_nd} を開放しました。')
+                save_state(seats)
+            else:
+                st.error(f'開放する席はありません')
+
 def main():
     # アプリのタイトル表示
     st.title('座席割り当てアプリ')
@@ -188,16 +245,19 @@ def main():
         seats = load_state()
         if seats is None:
             total_seats = max_seats
+            total_seats_nd = max_seats_nd
         else:
             total_seats = seats['seatsnum']
+            total_seats_nd = seats['seatsnum_nd']
 
         # 日付が変わったら、座席をリセット
         # current_date = datetime.now().date()
         # タイムゾーンを指定する
         current_date = datetime.now(jst).date()
         current_max_seats = total_seats
+        current_max_seats_nd = total_seats_nd
         if seats is None or seats['date'] != current_date:
-            seats = {'date': current_date, 'seatsnum': current_max_seats,'assigned': []}
+            seats = {'date': current_date, 'seatsnum': current_max_seats,'assigned': [], 'seatsnum_nd': current_max_seats_nd,'assigned_nd': []}
             # フェールセーフ
             save_state(seats) 
 
@@ -211,7 +271,8 @@ def main():
         # 注意の文言
         st.write(f'＜座席割り当てボタン＞は、1回だけ押してください')
 
-        if st.button('座席割り当てボタン'):
+        st.divider()
+        if st.button('座席割り当てボタン【ディスプレイ付】'):
             # フェールセーフ
             seats = load_state()
             total_seats = seats['seatsnum']
@@ -226,6 +287,22 @@ def main():
 
         st.write(f'現在の割り当て座席数: {len(seats["assigned"])}  ／  残り座席数: {total_seats - len(seats["assigned"])}')
         # st.write(f'{current_date}')
+
+        st.divider()
+        if st.button('座席割り当てボタン【ディスプレイなし】'):
+            # フェールセーフ
+            seats = load_state()
+            total_seats_nd = seats['seatsnum_nd']
+            available_seats_nd = list(set(range(1, total_seats_nd + 1)) - set(seats['assigned_nd']))
+            if available_seats_nd:
+                assigned_seat_nd = random.choice(available_seats_nd)
+                seats['assigned_nd'].append(assigned_seat_nd)
+                st.success(f'あなたの座席番号は ＜ {assigned_seat_nd} ＞ です。')
+                save_state(seats)
+            else:
+                st.error('空きの座席はありません。')
+
+        st.write(f'現在の割り当て座席数: {len(seats["assigned_nd"])}  ／  残り座席数: {total_seats_nd - len(seats["assigned_nd"])}')
 
         # デバッグ用：割り当てられた座席のリストを表示
         # st.write('割り当てられた座席: ', seats['assigned'])
