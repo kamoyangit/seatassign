@@ -242,7 +242,7 @@ def release_seats():
                 st.success(f'座席番号 {delete_seat} を開放しました。')
                 save_state(seats)
                 # Auto Refresh
-                st_autorefresh(interval=2000, limit=2, key="fizzbuzzcounter")
+                # st_autorefresh(interval=2000, limit=2, key="fizzbuzzcounter")
             else:
                 st.error(f'開放する席はありません')
 
@@ -263,7 +263,7 @@ def release_seats():
                 st.success(f'座席番号 {delete_seat_nd} を開放しました。')
                 save_state(seats)
                 # Auto Refresh
-                st_autorefresh(interval=2000, limit=2, key="fizzbuzzcounter")
+                # st_autorefresh(interval=2000, limit=2, key="fizzbuzzcounter")
             else:
                 st.error(f'開放する席はありません')
 
@@ -337,7 +337,7 @@ def main():
                 st.success(f'あなたの座席番号は ＜ {assigned_seat} ＞ です。')
                 save_state(seats)
                 # Auto Refresh
-                st_autorefresh(interval=2000, limit=2, key="fizzbuzzcounter")
+                # st_autorefresh(interval=2000, limit=2, key="fizzbuzzcounter")
             else:
                 st.error('空きの座席はありません。')
 
@@ -356,7 +356,7 @@ def main():
                 st.success(f'あなたの座席番号は ＜ {assigned_seat_nd} ＞ です。')
                 save_state(seats)
                 # Auto Refresh
-                st_autorefresh(interval=2000, limit=2, key="fizzbuzzcounter")
+                # st_autorefresh(interval=2000, limit=2, key="fizzbuzzcounter")
             else:
                 st.error('空きの座席はありません。')
 
