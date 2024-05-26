@@ -154,7 +154,7 @@ def admin_main():
             '開放する席の番号（ディスプレイ有り）',
             (seats["assigned"]))
         # st.write('開放する席の番号', delete_seat)
-        if st.button('【Admin】座席を開放する'):
+        if st.button('【Admin】座席を開放する  \n（ディスプレイ有り）'):
             # フェールセーフ
             seats = load_state()
             total_seats = seats['seatsnum']
@@ -166,7 +166,7 @@ def admin_main():
                 st.success(f'座席番号 {delete_seat} を開放しました。')
                 save_state(seats)
                 # Auto Refresh
-                st_autorefresh(interval=1000, limit=2, key="fizzbuzzcounter")
+                st_autorefresh(interval=2000, limit=2, key="fizzbuzzcounter")
             else:
                 st.error(f'開放する席はありません')
         
@@ -174,7 +174,7 @@ def admin_main():
             '開放する席の番号（ディスプレイ無し）',
             (seats["assigned_nd"]))
         # st.write('開放する席の番号', delete_seat)
-        if st.button('【Admin】座席を開放する'):
+        if st.button('【Admin】座席を開放する  \n（ディスプレイ無し）'):
             # フェールセーフ
             seats = load_state()
             total_seats = seats['seatsnum_nd']
@@ -186,7 +186,7 @@ def admin_main():
                 st.success(f'座席番号 {delete_seat_nd} を開放しました。')
                 save_state(seats)
                 # Auto Refresh
-                st_autorefresh(interval=1000, limit=2, key="fizzbuzzcounter")
+                st_autorefresh(interval=2000, limit=2, key="fizzbuzzcounter")
             else:
                 st.error(f'開放する席はありません')
     
@@ -230,7 +230,7 @@ def release_seats():
             '開放する席【ディスプレイ有り】の番号',
             (seats["assigned"]))
         # st.write('開放する席の番号', delete_seat)
-        if st.button('座席を開放する【ディスプレイ付】'):
+        if st.button('座席を開放する  \n【ディスプレイ有り】'):
             # フェールセーフ
             seats = load_state()
             total_seats = seats['seatsnum']
@@ -242,7 +242,7 @@ def release_seats():
                 st.success(f'座席番号 {delete_seat} を開放しました。')
                 save_state(seats)
                 # Auto Refresh
-                st_autorefresh(interval=1000, limit=2, key="fizzbuzzcounter")
+                st_autorefresh(interval=2000, limit=2, key="fizzbuzzcounter")
             else:
                 st.error(f'開放する席はありません')
 
@@ -251,7 +251,7 @@ def release_seats():
             '開放する席【ディスプレイ無し】の番号',
             (seats["assigned_nd"]))
         # st.write('開放する席の番号', delete_seat)
-        if st.button('座席を開放する【ディスプレイなし】'):
+        if st.button('座席を開放する  \n【ディスプレイなし】'):
             # フェールセーフ
             seats = load_state()
             total_seats_nd = seats['seatsnum_nd']
@@ -263,7 +263,7 @@ def release_seats():
                 st.success(f'座席番号 {delete_seat_nd} を開放しました。')
                 save_state(seats)
                 # Auto Refresh
-                st_autorefresh(interval=1000, limit=2, key="fizzbuzzcounter")
+                st_autorefresh(interval=2000, limit=2, key="fizzbuzzcounter")
             else:
                 st.error(f'開放する席はありません')
 
@@ -279,7 +279,7 @@ def drowRRectangle(params):
 
 def main():
     # アプリのタイトル表示
-    st.title('座席割り当てアプリ(Ver.2)')
+    st.title('座席割当アプリ(V2)')
 
     if check_password():
         seats = load_state()
@@ -304,7 +304,7 @@ def main():
         # 座席図の表示
         # st.image('AAA.png', caption='座席割り当て図', width=300)
         if Path(private_image_filename).exists():
-            st.image(private_image_filename, caption='座席割り当て図', width=300)
+            st.image(private_image_filename, caption='座席割当図', width=300)
         else:
             # st.image(default_image_filename, caption='座席割り当て図', width=300)
             # デフォルトイメージを使用する場合の処理
@@ -320,13 +320,13 @@ def main():
                 rect_params = drowRRectangle(rectParamsND[int(rect)-1])
                 draw.rectangle(rect_params, outline="blue", width=10)
             # 画像と矩形を表示
-            st.image(img, caption='座席割り当て図', width=300)
+            st.image(img, caption='座席割当図', width=300)
         
         # 注意の文言
-        st.write(f'＜座席割り当てボタン＞は、1回だけ押してください')
+        st.write(f'＜座席割当ボタン＞は、1回だけ押してください')
 
         st.divider()
-        if st.button('座席割り当てボタン【ディスプレイ有り】'):
+        if st.button('座席割当ボタン  \n【ディスプレイ有り】'):
             # フェールセーフ
             seats = load_state()
             total_seats = seats['seatsnum']
@@ -337,15 +337,15 @@ def main():
                 st.success(f'あなたの座席番号は ＜ {assigned_seat} ＞ です。')
                 save_state(seats)
                 # Auto Refresh
-                st_autorefresh(interval=1000, limit=2, key="fizzbuzzcounter")
+                st_autorefresh(interval=2000, limit=2, key="fizzbuzzcounter")
             else:
                 st.error('空きの座席はありません。')
 
-        st.write(f'現在の割り当て座席数: {len(seats["assigned"])}  ／  残り座席数: {total_seats - len(seats["assigned"])}')
+        st.write(f'現在の割当座席数: {len(seats["assigned"])}  ／  残り座席数: {total_seats - len(seats["assigned"])}')
         # st.write(f'{current_date}')
 
         st.divider()
-        if st.button('座席割り当てボタン【ディスプレイ無し】'):
+        if st.button('座席割当ボタン  \n【ディスプレイ無し】'):
             # フェールセーフ
             seats = load_state()
             total_seats_nd = seats['seatsnum_nd']
@@ -356,11 +356,11 @@ def main():
                 st.success(f'あなたの座席番号は ＜ {assigned_seat_nd} ＞ です。')
                 save_state(seats)
                 # Auto Refresh
-                st_autorefresh(interval=1000, limit=2, key="fizzbuzzcounter")
+                st_autorefresh(interval=2000, limit=2, key="fizzbuzzcounter")
             else:
                 st.error('空きの座席はありません。')
 
-        st.write(f'現在の割り当て座席数: {len(seats["assigned_nd"])}  ／  残り座席数: {total_seats_nd - len(seats["assigned_nd"])}')
+        st.write(f'現在の割当座席数: {len(seats["assigned_nd"])}  ／  残り座席数: {total_seats_nd - len(seats["assigned_nd"])}')
 
         # デバッグ用：割り当てられた座席のリストを表示
         # st.write('割り当てられた座席: ', seats['assigned'])
