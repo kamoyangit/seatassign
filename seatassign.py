@@ -4,8 +4,9 @@ from datetime import datetime, timedelta
 import pickle
 import os
 import pytz
-from PIL import Image
+from PIL import Image, ImageDraw
 from pathlib import Path
+from streamlit_autorefresh import st_autorefresh
 
 # 日本のタイムゾーンを指定
 jst = pytz.timezone('Asia/Tokyo')
@@ -17,6 +18,26 @@ private_image_filename = 'BBB.png'
 # 最大座席数
 max_seats = 12
 max_seats_nd = 4
+
+# ディスプレイのある座席の座標
+rectParams = (  '500,350,55,50'
+              , '500,570,55,50'
+              , '435,240,55,50'
+              , '435,350,55,50'
+              , '435,570,55,50'
+              , '345,295,55,50'
+              , '345,405,55,50'
+              , '345,625,55,50'
+              , '80,510,55,50'
+              , '80,645,55,50'
+              , '80,750,55,50'
+              , '10,645,55,50')
+
+# ディスプレイのない座席の座標
+rectParamsND = ('500,455,55,50'
+              , '435,455,55,50'
+              , '345,510,55,50'
+              , '10,510,55,50')
 
 # パスワードの確認
 def check_password():
@@ -130,10 +151,10 @@ def admin_main():
         st.write(f'指定した座席番号を開放します')
 
         delete_seat = st.selectbox(
-            '開放する席の番号（あり）',
+            '開放する席の番号（ディスプレイ有り）',
             (seats["assigned"]))
         # st.write('開放する席の番号', delete_seat)
-        if st.button('【Admin】座席を開放する【ディスプレイ付】'):
+        if st.button('【Admin】座席を開放する'):
             # フェールセーフ
             seats = load_state()
             total_seats = seats['seatsnum']
@@ -144,24 +165,28 @@ def admin_main():
                 available_seats = list(set(available_seats))
                 st.success(f'座席番号 {delete_seat} を開放しました。')
                 save_state(seats)
+                # Auto Refresh
+                st_autorefresh(interval=1000, limit=2, key="fizzbuzzcounter")
             else:
                 st.error(f'開放する席はありません')
         
         delete_seat_nd = st.selectbox(
-            '開放する席の番号（なし）',
+            '開放する席の番号（ディスプレイ無し）',
             (seats["assigned_nd"]))
         # st.write('開放する席の番号', delete_seat)
-        if st.button('【Admin】座席を開放する【ディスプレイなし】'):
+        if st.button('【Admin】座席を開放する'):
             # フェールセーフ
             seats = load_state()
             total_seats = seats['seatsnum_nd']
             available_seats_nd = list(set(range(1, total_seats_nd + 1)) - set(seats['assigned_nd']))
-            if delete_seat in seats['assigned_nd']:
+            if delete_seat_nd in seats['assigned_nd']:
                 seats['assigned_nd'].remove(delete_seat_nd)
                 available_seats_nd.append(delete_seat_nd)
                 available_seats_nd = list(set(available_seats_nd))
                 st.success(f'座席番号 {delete_seat_nd} を開放しました。')
                 save_state(seats)
+                # Auto Refresh
+                st_autorefresh(interval=1000, limit=2, key="fizzbuzzcounter")
             else:
                 st.error(f'開放する席はありません')
     
@@ -183,9 +208,10 @@ def admin_main():
             # current_date = datetime.now().date()
             current_date = datetime.now(jst).date()
             current_max_seats = seats['seatsnum']
+            current_max_seats_nd = seats['seatsnum_nd']
             # 1日前の日付情報を計算
             yesterday = current_date - timedelta(days=1)
-            seats = {'date': yesterday, 'seatsnum': current_max_seats,'assigned': seats['assigned']}
+            seats = {'date': yesterday, 'seatsnum': current_max_seats,'assigned': seats['assigned'], 'seatsnum_nd': current_max_seats_nd,'assigned_nd': seats['assigned_nd']}
             st.write(f'書き込んだ日付は{yesterday}')
             save_state(seats)
 
@@ -201,7 +227,7 @@ def release_seats():
 
         st.divider()
         delete_seat = st.selectbox(
-            '開放する席【ディスプレイ付】の番号',
+            '開放する席【ディスプレイ有り】の番号',
             (seats["assigned"]))
         # st.write('開放する席の番号', delete_seat)
         if st.button('座席を開放する【ディスプレイ付】'):
@@ -215,12 +241,14 @@ def release_seats():
                 available_seats = list(set(available_seats))
                 st.success(f'座席番号 {delete_seat} を開放しました。')
                 save_state(seats)
+                # Auto Refresh
+                st_autorefresh(interval=1000, limit=2, key="fizzbuzzcounter")
             else:
                 st.error(f'開放する席はありません')
 
         st.divider()
         delete_seat_nd = st.selectbox(
-            '開放する席【ディスプレイなし】の番号',
+            '開放する席【ディスプレイ無し】の番号',
             (seats["assigned_nd"]))
         # st.write('開放する席の番号', delete_seat)
         if st.button('座席を開放する【ディスプレイなし】'):
@@ -234,12 +262,24 @@ def release_seats():
                 available_seats_nd = list(set(available_seats_nd))
                 st.success(f'座席番号 {delete_seat_nd} を開放しました。')
                 save_state(seats)
+                # Auto Refresh
+                st_autorefresh(interval=1000, limit=2, key="fizzbuzzcounter")
             else:
                 st.error(f'開放する席はありません')
 
+# 矩形座標のパラメータの前処理
+def drowRRectangle(params):
+    # 矩形の位置とサイズを指定
+    rect_params = (params)
+    rect_params = [int(param) for param in rect_params.split(',')]
+    # width/heightを正しく代入する処理を追加
+    rect_params[2] = rect_params[0] + rect_params[2]
+    rect_params[3] = rect_params[1] + rect_params[3]
+    return rect_params
+
 def main():
     # アプリのタイトル表示
-    st.title('座席割り当てアプリ')
+    st.title('座席割り当てアプリ(Ver.2)')
 
     if check_password():
         seats = load_state()
@@ -266,13 +306,27 @@ def main():
         if Path(private_image_filename).exists():
             st.image(private_image_filename, caption='座席割り当て図', width=300)
         else:
-            st.image(default_image_filename, caption='座席割り当て図', width=300)
+            # st.image(default_image_filename, caption='座席割り当て図', width=300)
+            # デフォルトイメージを使用する場合の処理
+            img = Image.open(default_image_filename)
+            # 矩形を描画
+            draw = ImageDraw.Draw(img)
+            # ディスプレイ有りの席に対する処理
+            for rect in seats['assigned']:
+                rect_params = drowRRectangle(rectParams[int(rect)-1])
+                draw.rectangle(rect_params, outline="red", width=10)
+            # ディスプレイ無しの席に対する処理
+            for rect in seats['assigned_nd']:
+                rect_params = drowRRectangle(rectParamsND[int(rect)-1])
+                draw.rectangle(rect_params, outline="blue", width=10)
+            # 画像と矩形を表示
+            st.image(img, caption='座席割り当て図', width=300)
         
         # 注意の文言
         st.write(f'＜座席割り当てボタン＞は、1回だけ押してください')
 
         st.divider()
-        if st.button('座席割り当てボタン【ディスプレイ付】'):
+        if st.button('座席割り当てボタン【ディスプレイ有り】'):
             # フェールセーフ
             seats = load_state()
             total_seats = seats['seatsnum']
@@ -282,6 +336,8 @@ def main():
                 seats['assigned'].append(assigned_seat)
                 st.success(f'あなたの座席番号は ＜ {assigned_seat} ＞ です。')
                 save_state(seats)
+                # Auto Refresh
+                st_autorefresh(interval=1000, limit=2, key="fizzbuzzcounter")
             else:
                 st.error('空きの座席はありません。')
 
@@ -289,7 +345,7 @@ def main():
         # st.write(f'{current_date}')
 
         st.divider()
-        if st.button('座席割り当てボタン【ディスプレイなし】'):
+        if st.button('座席割り当てボタン【ディスプレイ無し】'):
             # フェールセーフ
             seats = load_state()
             total_seats_nd = seats['seatsnum_nd']
@@ -299,6 +355,8 @@ def main():
                 seats['assigned_nd'].append(assigned_seat_nd)
                 st.success(f'あなたの座席番号は ＜ {assigned_seat_nd} ＞ です。')
                 save_state(seats)
+                # Auto Refresh
+                st_autorefresh(interval=1000, limit=2, key="fizzbuzzcounter")
             else:
                 st.error('空きの座席はありません。')
 
