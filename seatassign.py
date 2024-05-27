@@ -20,24 +20,24 @@ max_seats = 12
 max_seats_nd = 4
 
 # ディスプレイのある座席の座標
-rectParams = (  '500,350,55,50'
-              , '500,570,55,50'
-              , '435,240,55,50'
-              , '435,350,55,50'
-              , '435,570,55,50'
-              , '345,295,55,50'
-              , '345,405,55,50'
-              , '345,625,55,50'
-              , '80,510,55,50'
-              , '80,645,55,50'
-              , '80,750,55,50'
-              , '10,645,55,50')
+rectParams = (  '203,163,27,23'
+              , '203,275,27,23'
+              , '168,105,27,23'
+              , '168,163,27,23'
+              , '168,275,27,23'
+              , '122,133,27,23'
+              , '122,191,27,23'
+              , '122,302,27,23'
+              , '200,385,27,23'
+              , '170,458,27,23'
+              , '125,382,27,23'
+              , '124,465,27,23')
 
 # ディスプレイのない座席の座標
-rectParamsND = ('500,455,55,50'
-              , '435,455,55,50'
-              , '345,510,55,50'
-              , '10,510,55,50')
+rectParamsND = ('203,216,27,23'
+              , '168,216,27,23'
+              , '122,243,27,23'
+              , '168,372,27,23')
 
 # パスワードの確認
 def check_password():
@@ -314,11 +314,11 @@ def main():
             # ディスプレイ有りの席に対する処理
             for rect in seats['assigned']:
                 rect_params = drowRRectangle(rectParams[int(rect)-1])
-                draw.rectangle(rect_params, outline="red", width=10)
+                draw.rectangle(rect_params, outline="red", width=3)
             # ディスプレイ無しの席に対する処理
             for rect in seats['assigned_nd']:
                 rect_params = drowRRectangle(rectParamsND[int(rect)-1])
-                draw.rectangle(rect_params, outline="blue", width=10)
+                draw.rectangle(rect_params, outline="blue", width=3)
             # 画像と矩形を表示
             st.image(img, caption='座席割当図', width=300)
         
