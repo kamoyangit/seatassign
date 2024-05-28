@@ -17,27 +17,30 @@ private_image_filename = 'BBB.png'
 
 # 最大座席数
 max_seats = 12
-max_seats_nd = 4
+max_seats_nd = 4    # 10以下
 
 # ディスプレイのある座席の座標
-rectParams = (  '203,163,27,23'
-              , '203,275,27,23'
-              , '168,105,27,23'
-              , '168,163,27,23'
-              , '168,275,27,23'
-              , '122,133,27,23'
-              , '122,191,27,23'
-              , '122,302,27,23'
-              , '200,385,27,23'
-              , '170,458,27,23'
-              , '125,382,27,23'
-              , '124,465,27,23')
+rectParams = (  '200,159,27,23'
+              , '200,268,27,23'
+              , '167,104,27,23'
+              , '167,159,27,23'
+              , '167,268,27,23'
+              , '122,131,27,23'
+              , '122,186,27,23'
+              , '122,294,27,23'
+              , '197,375,27,23'
+              , '167,445,27,23'
+              , '125,372,27,23'
+              , '124,452,27,23')
 
 # ディスプレイのない座席の座標
-rectParamsND = ('203,216,27,23'
-              , '168,216,27,23'
-              , '122,243,27,23'
-              , '168,372,27,23')
+rectParamsND = ('200,211,27,23'
+              , '168,211,27,23'
+              , '122,237,27,23'
+              , '167,362,27,23')
+
+# ディスプレイのない座席の名前
+nameND = ['A','B','C','D','E','F','G','H','I','J']
 
 # パスワードの確認
 def check_password():
@@ -102,7 +105,7 @@ def image_uploader():
 
 def max_seats_update():
     seats = load_state()
-    new_max_seats = st.number_input("最大座席数【ディスプレイ付】を入力して下さい", min_value=2, max_value=1000, value=seats['seatsnum'], step=1)
+    new_max_seats = st.number_input("最大座席数【ディスプレイ付】を入力して下さい  \nただし、12以下の数字にして下さい", min_value=2, max_value=12, value=seats['seatsnum'], step=1)
     if st.button("座席数の更新【ディスプレイ付】"):
         # Bugfix
         # タイムゾーンを指定する
@@ -115,7 +118,7 @@ def max_seats_update():
 
 def max_seats_nd_update():
     seats = load_state()
-    new_max_seats_nd = st.number_input("最大座席数【ディスプレイなし】を入力して下さい", min_value=2, max_value=1000, value=seats['seatsnum_nd'], step=1)
+    new_max_seats_nd = st.number_input("最大座席数【ディスプレイなし】を入力して下さい  \nただし、4以下の数字にして下さい", min_value=2, max_value=4, value=seats['seatsnum_nd'], step=1)
     if st.button("座席数の更新【ディスプレイなし】"):
         # Bugfix
         # タイムゾーンを指定する
@@ -171,7 +174,7 @@ def admin_main():
                 st.error(f'開放する席はありません')
         
         delete_seat_nd = st.selectbox(
-            '開放する席の番号（ディスプレイ無し）',
+            '開放する席の番号（ディスプレイ無し）  \n”ABCD”は、”1234”と読み替えて下さい',
             (seats["assigned_nd"]))
         # st.write('開放する席の番号', delete_seat)
         if st.button('【Admin】座席を開放する  \n（ディスプレイ無し）'):
@@ -183,7 +186,7 @@ def admin_main():
                 seats['assigned_nd'].remove(delete_seat_nd)
                 available_seats_nd.append(delete_seat_nd)
                 available_seats_nd = list(set(available_seats_nd))
-                st.success(f'座席番号 {delete_seat_nd} を開放しました。')
+                st.success(f'座席番号 {nameND[int(delete_seat_nd)-1]} を開放しました。')
                 save_state(seats)
                 # Auto Refresh
                 st_autorefresh(interval=2000, limit=2, key="fizzbuzzcounter")
@@ -248,7 +251,7 @@ def release_seats():
 
         st.divider()
         delete_seat_nd = st.selectbox(
-            '開放する席【ディスプレイ無し】の番号',
+            '開放する席【ディスプレイ無し】の番号  \n”ABCD”は、”1234”と読み替えて下さい',
             (seats["assigned_nd"]))
         # st.write('開放する席の番号', delete_seat)
         if st.button('座席を開放する  \n【ディスプレイなし】'):
@@ -260,7 +263,7 @@ def release_seats():
                 seats['assigned_nd'].remove(delete_seat_nd)
                 available_seats_nd.append(delete_seat_nd)
                 available_seats_nd = list(set(available_seats_nd))
-                st.success(f'座席番号 {delete_seat_nd} を開放しました。')
+                st.success(f'座席番号 {nameND[int(delete_seat_nd)-1]} を開放しました。')
                 save_state(seats)
                 # Auto Refresh
                 # st_autorefresh(interval=2000, limit=2, key="fizzbuzzcounter")
@@ -353,7 +356,7 @@ def main():
             if available_seats_nd:
                 assigned_seat_nd = random.choice(available_seats_nd)
                 seats['assigned_nd'].append(assigned_seat_nd)
-                st.success(f'あなたの座席番号は ＜ {assigned_seat_nd} ＞ です。')
+                st.success(f'あなたの座席番号は ＜ {nameND[int(assigned_seat_nd)-1]} ＞ です。')
                 save_state(seats)
                 # Auto Refresh
                 # st_autorefresh(interval=2000, limit=2, key="fizzbuzzcounter")
