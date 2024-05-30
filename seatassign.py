@@ -129,6 +129,21 @@ def max_seats_nd_update():
             seats['seatsnum_nd'] = new_max_seats_nd
         save_state(seats)
 
+def generate_alphabets(n):
+    alphabets = []
+    for i in range(n):
+        # 65は'A'のASCIIコード、連続するアルファベットを生成する
+        alphabet = chr(65 + i % 26)  # 26文字を超えたら再び'A'に戻る
+        alphabets.append(alphabet)
+    return alphabets  # 文字列のリストとして返す
+
+def alphabet_position(letter):
+    # 大文字に変換して統一性を保つ
+    letter = letter.upper()
+    # 'A'のASCIIコードは65なので、それを基準にして位置を計算
+    position = ord(letter) - ord('A') + 1
+    return position
+
 # Adminパスワードの確認
 def check_password_admin():
     # 環境変数を取得
@@ -174,7 +189,7 @@ def admin_main():
                 st.error(f'開放する席はありません')
         
         delete_seat_nd = st.selectbox(
-            '開放する席の番号（ディスプレイ無し）  \n”ABCD”は、”1234”と読み替えて下さい',
+            '開放する席の番号（ディスプレイ無し）',
             (seats["assigned_nd"]))
         # st.write('開放する席の番号', delete_seat)
         if st.button('【Admin】座席を開放する  \n（ディスプレイ無し）'):
@@ -186,7 +201,8 @@ def admin_main():
                 seats['assigned_nd'].remove(delete_seat_nd)
                 available_seats_nd.append(delete_seat_nd)
                 available_seats_nd = list(set(available_seats_nd))
-                st.success(f'座席番号 {nameND[int(delete_seat_nd)-1]} を開放しました。')
+                # st.success(f'座席番号 {nameND[int(delete_seat_nd)-1]} を開放しました。')
+                st.success(f'座席番号 {delete_seat_nd} を開放しました。')
                 save_state(seats)
                 # Auto Refresh
                 st_autorefresh(interval=2000, limit=2, key="fizzbuzzcounter")
@@ -251,7 +267,7 @@ def release_seats():
 
         st.divider()
         delete_seat_nd = st.selectbox(
-            '開放する席【ディスプレイ無し】の番号  \n”ABCD”は、”1234”と読み替えて下さい',
+            '開放する席【ディスプレイ無し】の番号 ',
             (seats["assigned_nd"]))
         # st.write('開放する席の番号', delete_seat)
         if st.button('座席を開放する  \n【ディスプレイなし】'):
@@ -263,7 +279,8 @@ def release_seats():
                 seats['assigned_nd'].remove(delete_seat_nd)
                 available_seats_nd.append(delete_seat_nd)
                 available_seats_nd = list(set(available_seats_nd))
-                st.success(f'座席番号 {nameND[int(delete_seat_nd)-1]} を開放しました。')
+                # st.success(f'座席番号 {nameND[int(delete_seat_nd)-1]} を開放しました。')
+                st.success(f'座席番号 {delete_seat_nd} を開放しました。')
                 save_state(seats)
                 # Auto Refresh
                 # st_autorefresh(interval=2000, limit=2, key="fizzbuzzcounter")
@@ -320,6 +337,8 @@ def main():
                 draw.rectangle(rect_params, outline="red", width=3)
             # ディスプレイ無しの席に対する処理
             for rect in seats['assigned_nd']:
+                # アルファベットの先頭からの位置を返す処理
+                rect = alphabet_position(rect)
                 rect_params = drowRRectangle(rectParamsND[int(rect)-1])
                 draw.rectangle(rect_params, outline="blue", width=3)
             # 画像と矩形を表示
@@ -352,11 +371,14 @@ def main():
             # フェールセーフ
             seats = load_state()
             total_seats_nd = seats['seatsnum_nd']
-            available_seats_nd = list(set(range(1, total_seats_nd + 1)) - set(seats['assigned_nd']))
+            # available_seats_nd = list(set(range(1, total_seats_nd + 1)) - set(seats['assigned_nd']))
+            # total_seats_ndの数に対応したアルファベットのリストをAから生成し、既に使用（登録）アルファベットは削除する
+            available_seats_nd = list(set(generate_alphabets(total_seats_nd)) - set(seats['assigned_nd']))
             if available_seats_nd:
                 assigned_seat_nd = random.choice(available_seats_nd)
                 seats['assigned_nd'].append(assigned_seat_nd)
-                st.success(f'あなたの座席番号は ＜ {nameND[int(assigned_seat_nd)-1]} ＞ です。')
+                # st.success(f'あなたの座席番号は ＜ {nameND[int(assigned_seat_nd)-1]} ＞ です。')
+                st.success(f'あなたの座席番号は ＜ {assigned_seat_nd} ＞ です。')
                 save_state(seats)
                 # Auto Refresh
                 # st_autorefresh(interval=2000, limit=2, key="fizzbuzzcounter")
