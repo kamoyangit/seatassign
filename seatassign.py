@@ -300,7 +300,7 @@ def drowRRectangle(params):
     rect_params[3] = rect_params[1] + rect_params[3]
     return rect_params
 
-@st.dialog("座席確認【ディスプレイ有り】")
+@st.dialog("座席確認")
 def approve_button_disp(num):
         st.success(f'{num}')
 
@@ -317,7 +317,7 @@ def approve_button_disp(num):
         # （右上の❎で閉じるようにする）
         st.markdown('## ポップアップ画面は、右上の x で閉じてください ##')
 
-@st.dialog("座席確認【ディスプレイ無し】")
+@st.dialog("座席確認")
 def approve_button_nodisp(num):
         st.success(f'{num}')
 
