@@ -42,6 +42,9 @@ rectParamsND = ('200,211,27,23'
 # ディスプレイのない座席の名前
 nameND = ['A','B','C','D','E','F','G','H','I','J']
 
+# 名前リスト
+name = ['小村','今村','柿本','袖山','工藤','須藤','町野','市原','田中','西岡','佐々木','林','松崎','加瀬谷','藤田','丸山','鴨川']
+
 # パスワードの確認
 def check_password():
     # 環境変数を取得
@@ -297,9 +300,45 @@ def drowRRectangle(params):
     rect_params[3] = rect_params[1] + rect_params[3]
     return rect_params
 
+@st.dialog("座席確認【ディスプレイ有り】")
+def approve_button_disp(num):
+        st.success(f'{num}')
+
+        # デフォルトイメージを使用する場合の処理
+        img = Image.open(default_image_filename)
+
+        # 矩形を描画
+        draw = ImageDraw.Draw(img)
+        rect_params = drowRRectangle(rectParams[num-1])
+        draw.rectangle(rect_params, outline="red", width=3)
+        # 画像と矩形を表示
+        st.image(img, caption='座席割当図', width=300)
+
+        # （右上の❎で閉じるようにする）
+        st.markdown('## ポップアップ画面は、右上の x で閉じてください ##')
+
+@st.dialog("座席確認【ディスプレイ無し】")
+def approve_button_nodisp(num):
+        st.success(f'{num}')
+
+        # デフォルトイメージを使用する場合の処理
+        img = Image.open(default_image_filename)
+
+        # 矩形を描画
+        draw = ImageDraw.Draw(img)
+        # アルファベットの先頭からの位置を返す処理
+        rect = alphabet_position(num)
+        rect_params = drowRRectangle(rectParamsND[rect-1])
+        draw.rectangle(rect_params, outline="blue", width=3)
+        # 画像と矩形を表示
+        st.image(img, caption='座席割当図', width=300)
+
+        # （右上の❎で閉じるようにする）
+        st.markdown('## ポップアップ画面は、右上の x で閉じてください ##')
+
 def main():
     # アプリのタイトル表示
-    st.title('座席割当アプリ(V2)')
+    st.title('座席ガチャアプリ(V3)')
 
     if check_password():
         seats = load_state()
@@ -323,6 +362,7 @@ def main():
 
         # 座席図の表示
         # st.image('AAA.png', caption='座席割り当て図', width=300)
+
         if Path(private_image_filename).exists():
             st.image(private_image_filename, caption='座席割当図', width=300)
         else:
@@ -356,6 +396,7 @@ def main():
             if available_seats:
                 assigned_seat = random.choice(available_seats)
                 seats['assigned'].append(assigned_seat)
+                approve_button_disp(assigned_seat)
                 st.success(f'あなたの座席番号は ＜ {assigned_seat} ＞ です。')
                 save_state(seats)
                 # Auto Refresh
@@ -378,6 +419,7 @@ def main():
                 assigned_seat_nd = random.choice(available_seats_nd)
                 seats['assigned_nd'].append(assigned_seat_nd)
                 # st.success(f'あなたの座席番号は ＜ {nameND[int(assigned_seat_nd)-1]} ＞ です。')
+                approve_button_nodisp(assigned_seat_nd)
                 st.success(f'あなたの座席番号は ＜ {assigned_seat_nd} ＞ です。')
                 save_state(seats)
                 # Auto Refresh
