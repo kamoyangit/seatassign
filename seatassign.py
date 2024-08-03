@@ -338,7 +338,7 @@ def approve_button_nodisp(num):
 
 def main():
     # アプリのタイトル表示
-    st.title('座席ガチャアプリ(V3)')
+    st.title('座席ガチャ(V3)')
 
     if check_password():
         seats = load_state()
