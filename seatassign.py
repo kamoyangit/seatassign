@@ -300,6 +300,42 @@ def drowRRectangle(params):
     rect_params[3] = rect_params[1] + rect_params[3]
     return rect_params
 
+# =========================================================
+# おみくじの結果と顔文字の辞書
+omikuji_results = {
+    "大吉": "大吉 😊",
+    "中吉": "中吉 😌",
+    "小吉": "小吉 🙂"
+}
+
+# セッションステートを初期化
+if 'count' not in st.session_state:
+    st.session_state.count = 0
+
+# ダイアログを表示する
+@st.dialog("今日運勢")
+def omikuji_button_disp():
+    st.session_state.count += 1
+    result = random.choice(list(omikuji_results.keys()))
+    message = f"結果は、 {omikuji_results[result]} です！"
+
+    # countは、閉じる時にもアップされる・・・    
+    if st.session_state.count == 1:
+        message += " 知らんけど。"
+    elif st.session_state.count == 3:
+        message += " 何度も、引かんといて。"
+    elif st.session_state.count == 5:
+        message += " ええ加減にして。"
+    elif st.session_state.count > 5:
+        message = "えーい、もう、凶じゃ！😭"
+        
+    # st.divider()
+    st.write(message)
+    # st.divider()
+    if st.button("閉じる"):
+        st.rerun()
+# =========================================================
+
 @st.dialog("座席確認")
 def approve_button_disp(num):
         st.success(f'{num}')
@@ -315,7 +351,11 @@ def approve_button_disp(num):
         st.image(img, caption='座席割当図', width=300)
 
         # （右上の❎で閉じるようにする）
-        st.markdown('## ポップアップ画面は、右上の x で閉じてください ##')
+        # st.markdown('## ポップアップ画面は、右上の x で閉じてください ##')
+        
+        # ボタンで閉じると前の描画が実行されてNG(Ver1.38.0からOK)
+        if st.button("確認しました"):
+            st.rerun()
 
 @st.dialog("座席確認")
 def approve_button_nodisp(num):
@@ -334,11 +374,16 @@ def approve_button_nodisp(num):
         st.image(img, caption='座席割当図', width=300)
 
         # （右上の❎で閉じるようにする）
-        st.markdown('## ポップアップ画面は、右上の x で閉じてください ##')
+        # st.markdown('## ポップアップ画面は、右上の x で閉じてください ##')
+
+        # ボタンで閉じると前の描画が実行されてNG(Ver1.38.0からOK)
+        if st.button("確認しました"):
+            st.rerun()
+        
 
 def main():
     # アプリのタイトル表示
-    st.title('座席ガチャ(V3)')
+    st.title('座席ガチャ(V3.1)')
 
     if check_password():
         seats = load_state()
@@ -359,6 +404,13 @@ def main():
             seats = {'date': current_date, 'seatsnum': current_max_seats,'assigned': [], 'seatsnum_nd': current_max_seats_nd,'assigned_nd': []}
             # フェールセーフ
             save_state(seats) 
+
+        # ====================================================
+        # おみくじボタンの機能(1回引くと表示されなくする)
+        if st.session_state.count == 0:
+            if st.button("【おみくじ】を引く🔮", key="omikuji_button"):
+                omikuji_button_disp()
+        # ====================================================
 
         # 座席図の表示
         # st.image('AAA.png', caption='座席割り当て図', width=300)
@@ -385,10 +437,10 @@ def main():
             st.image(img, caption='座席割当図', width=300)
         
         # 注意の文言
-        st.write(f'＜座席割当ボタン＞は、1回だけ押してください')
+        # st.write(f'＜座席割当ボタン＞は、1回だけ押してください')
 
-        st.divider()
-        if st.button('座席割当ボタン  \n【ディスプレイ有り】'):
+        # st.divider()
+        if st.button('座席割当ボタン  \n【モニタ有り】'):
             # フェールセーフ
             seats = load_state()
             total_seats = seats['seatsnum']
@@ -404,11 +456,11 @@ def main():
             else:
                 st.error('空きの座席はありません。')
 
-        st.write(f'現在の割当座席数: {len(seats["assigned"])}  ／  残り座席数: {total_seats - len(seats["assigned"])}')
+        st.write(f'割当座席数: {len(seats["assigned"])}  ／  残り座席数: {total_seats - len(seats["assigned"])}')
         # st.write(f'{current_date}')
 
         st.divider()
-        if st.button('座席割当ボタン  \n【ディスプレイ無し】'):
+        if st.button('座席割当ボタン  \n【モニタ無し】'):
             # フェールセーフ
             seats = load_state()
             total_seats_nd = seats['seatsnum_nd']
@@ -427,7 +479,7 @@ def main():
             else:
                 st.error('空きの座席はありません。')
 
-        st.write(f'現在の割当座席数: {len(seats["assigned_nd"])}  ／  残り座席数: {total_seats_nd - len(seats["assigned_nd"])}')
+        st.write(f'割当座席数: {len(seats["assigned_nd"])}  ／  残り座席数: {total_seats_nd - len(seats["assigned_nd"])}')
 
         # デバッグ用：割り当てられた座席のリストを表示
         # st.write('割り当てられた座席: ', seats['assigned'])
