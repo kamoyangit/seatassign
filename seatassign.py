@@ -54,7 +54,7 @@ def main():
         # ====================================================
         with col1:
             # おみくじボタンの機能
-            if st.button("【おみくじ⛩️】", key="omikuji_button"):
+            if st.button("【おみくじ】を引く", key="omikuji_button"):
                 omikuji_button_disp()
         # ====================================================
         with col2:
