@@ -14,7 +14,7 @@ genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
 model = genai.GenerativeModel('gemini-1.5-flash')
 
 # 質問内容の文面
-request_text = "は何の日か調べて、200文字以内で簡単な記事を作成してください"
+request_text = "は何の日か、ユーモアを交えて、200文字以内で簡単な記事を作成してください"
 
 # ダイアログを表示する
 @st.dialog("TOPIC by Google-Gemini")
