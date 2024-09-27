@@ -11,7 +11,8 @@ jst = pytz.timezone('Asia/Tokyo')
 genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
 
 # モデルの指定
-model = genai.GenerativeModel('gemini-1.5-flash')
+# model = genai.GenerativeModel('gemini-1.5-flash')
+model = genai.GenerativeModel('gemini-1.5-flash-002')
 
 # 質問内容の文面
 request_text = "は何の日か、ユーモアを交えて、200文字以内で簡単な記事を作成してください"
