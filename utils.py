@@ -23,6 +23,16 @@ def check_password2():
     else:
         return False
 
+# パスワードの確認
+def check_password3():
+    # 環境変数を取得
+    PASSWD3 = os.environ.get('PASS_KEY')
+    password3 = st.text_input("郵便当番修正（当番がずれた場合には修正して下さい）", type="password")
+    if password3 == PASSWD3:
+        return True
+    else:
+        return False
+
 # Adminパスワードの確認
 def check_password_admin():
     # 環境変数を取得
