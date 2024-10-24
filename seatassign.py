@@ -30,7 +30,7 @@ max_seats_nd = 4    # 10以下
 
 def main():
     # アプリのタイトル表示
-    st.title('座席ガチャ(V4.0)')
+    st.title('座席ガチャ(V4.1)')
 
     if check_password():
         seats = load_state()
