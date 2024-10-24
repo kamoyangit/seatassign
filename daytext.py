@@ -53,8 +53,10 @@ def decrement_week(state):
 def check_and_update_week(state, today):
     """毎週月曜日に週を進めるチェックを行い、必要に応じて更新"""
     last_update = state.get("last_update")
-    if last_update and (today - last_update).days >= 7:
-        state = increment_week(state)
+    if last_update:
+        # 前回の更新日と今日の日付が異なる週であれば、increment_weekを呼ぶ
+        if last_update.isocalendar()[1] != today.isocalendar()[1]:
+            state = increment_week(state)
     state["last_update"] = today
     return state
 
