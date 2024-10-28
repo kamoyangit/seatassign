@@ -1,6 +1,7 @@
 import streamlit as st
 import json
-import datetime
+# import datetime
+from datetime import datetime
 import os
 
 from utils import check_password3
@@ -37,7 +38,9 @@ def load_state():
                 loaded_state = json.load(f)
                 if loaded_state["last_update"]:
                     # loaded_state["last_update"] = datetime.date.fromisoformat(loaded_state["last_update"])
-                    loaded_state["last_update"] = datetime.now(jst).date.fromisoformat(loaded_state["last_update"])
+                    loaded_state["last_update"] = datetime.fromisoformat(loaded_state["last_update"])
+                    # 日本時間に変換（タイムゾーンをローカル化）
+                    loaded_state["last_update"] = jst.localize(loaded_state["last_update"])
                 return loaded_state
             except json.JSONDecodeError:
                 st.error("状態ファイルの読み込みに失敗しました。初期状態を使用します。")
@@ -70,7 +73,7 @@ app_state = load_state()
 arrays = app_state["arrays"]
 current_week = app_state["current_week"]
 # today = datetime.date.today()
-today = datetime.now(jst).date.today()
+today = datetime.now(jst).date()
 
 # 初回ロード時に更新を確認
 if "initial_load" not in st.session_state:
