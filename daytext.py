@@ -5,7 +5,12 @@ import os
 
 from utils import check_password3
 
+import pytz
+
 STATE_FILE = "app_state.json"
+
+# 日本のタイムゾーンを指定
+jst = pytz.timezone('Asia/Tokyo')
 
 default_state = {
     "arrays": ['鴨川', '西岡', '林', '工藤','小村', '佐々木', '袖山', '田中', '畑', '町野', '藤田', '松崎', '丸山', '市原', '今村', '柿本', '須藤'],
@@ -31,7 +36,8 @@ def load_state():
             try:
                 loaded_state = json.load(f)
                 if loaded_state["last_update"]:
-                    loaded_state["last_update"] = datetime.date.fromisoformat(loaded_state["last_update"])
+                    # loaded_state["last_update"] = datetime.date.fromisoformat(loaded_state["last_update"])
+                    loaded_state["last_update"] = datetime.now(jst).date.fromisoformat(loaded_state["last_update"])
                 return loaded_state
             except json.JSONDecodeError:
                 st.error("状態ファイルの読み込みに失敗しました。初期状態を使用します。")
@@ -63,7 +69,8 @@ def check_and_update_week(state, today):
 app_state = load_state()
 arrays = app_state["arrays"]
 current_week = app_state["current_week"]
-today = datetime.date.today()
+# today = datetime.date.today()
+today = datetime.now(jst).date.today()
 
 # 初回ロード時に更新を確認
 if "initial_load" not in st.session_state:
