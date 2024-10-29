@@ -2,6 +2,7 @@ import streamlit as st
 import json
 import datetime
 import os
+import pytz
 
 from utils import check_password3
 
@@ -63,7 +64,12 @@ def check_and_update_week(state, today):
 app_state = load_state()
 arrays = app_state["arrays"]
 current_week = app_state["current_week"]
-today = datetime.date.today()
+# today = datetime.date.today()
+# 一旦UTCを計算して、JSTに変換して、本日の日付を取得する
+utc_now = datetime.datetime.now(datetime.timezone.utc)
+japan_tz = pytz.timezone('Asia/Tokyo')
+japan_time = utc_now.astimezone(japan_tz)
+today = japan_time.date()
 
 # 初回ロード時に更新を確認
 if "initial_load" not in st.session_state:
@@ -111,7 +117,7 @@ def change_on_duty():
 @st.dialog("当番の修正")
 def inc_dec_on_duty():
     # 当番の表示
-    st.write(f"今週の郵便当番: {get_on_duty()}")
+    st.write(f"今週の郵便当番: {get_on_duty()} : {japan_time}")
     # 一週分進める
     if st.button("ひとつ進める"):
         app_state = load_state()
