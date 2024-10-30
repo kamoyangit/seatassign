@@ -66,19 +66,20 @@ arrays = app_state["arrays"]
 current_week = app_state["current_week"]
 # today = datetime.date.today()
 # 一旦UTCを計算して、JSTに変換して、本日の日付を取得する
+# --------------------
 utc_now = datetime.datetime.now(datetime.timezone.utc)
 japan_tz = pytz.timezone('Asia/Tokyo')
 japan_time = utc_now.astimezone(japan_tz)
 today = japan_time.date()
-
+# --------------------
 # 初回ロード時に更新を確認
 if "initial_load" not in st.session_state:
     st.session_state.initial_load = True
     app_state = check_and_update_week(app_state, today)
     save_state(app_state)
-
+# --------------------
 # 表示内容
-current_week = app_state["current_week"]
+# current_week = app_state["current_week"]
 
 '''
 st.write(f"今週の当番: {arrays[current_week]}")
@@ -101,12 +102,26 @@ save_state(app_state)
 # ------------------
 # 外部からコールする関数
 # ------------------
-# 当番の名前を貸す関数
+# 当番の名前を返す関数
 def get_on_duty():
     app_state = load_state()
+    # --------------------
+    utc_now = datetime.datetime.now(datetime.timezone.utc)
+    japan_tz = pytz.timezone('Asia/Tokyo')
+    japan_time = utc_now.astimezone(japan_tz)
+    today = japan_time.date()
+    app_state = check_and_update_week(app_state, today)
+    save_state(app_state)
+    # --------------------
     current_week = app_state["current_week"]
     return arrays[current_week]
 
+# 現在時刻を返す関数
+def get_current_time():
+    utc_now = datetime.datetime.now(datetime.timezone.utc)
+    japan_tz = pytz.timezone('Asia/Tokyo')
+    japan_time = utc_now.astimezone(japan_tz)
+    return japan_time
 
 # 座席を開放する関数
 def change_on_duty():
@@ -117,7 +132,7 @@ def change_on_duty():
 @st.dialog("当番の修正")
 def inc_dec_on_duty():
     # 当番の表示
-    st.write(f"今週の郵便当番: {get_on_duty()} : {japan_time}")
+    st.write(f"今週の郵便当番: {get_on_duty()} : {get_current_time()}")
     # 一週分進める
     if st.button("ひとつ進める"):
         app_state = load_state()
