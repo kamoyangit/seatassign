@@ -12,13 +12,13 @@ default_image_filename = 'AAA.png'
 private_image_filename = 'BBB.png'
 
 # 矩形座標のパラメータの前処理
-rectParams = ('200,159,27,23', '200,268,27,23', '167,104,27,23', '167,159,27,23', '167,268,27,23', '122,131,27,23', '122,186,27,23', '122,294,27,23', '197,375,27,23', '167,445,27,23', '125,372,27,23', '124,452,27,23')
+rectParams = ('200,159,27,23', '200,268,27,23', '167,104,27,23', '167,159,27,23', '167,268,27,23', '122,131,27,23', '122,186,27,23', '122,294,27,23', '197,375,27,23', '167,445,27,23', '125,372,27,23', '124,452,27,23', '200,104,27,23')
 rectParamsND = ('200,211,27,23', '168,211,27,23', '122,237,27,23', '167,362,27,23')
 
 # 最大座席数を更新
 def max_seats_update():
     seats = load_state()
-    new_max_seats = st.number_input("最大座席数【モニタ有り】を入力して下さい  \nただし、12以下の数字にして下さい", min_value=2, max_value=12, value=seats['seatsnum'], step=1)
+    new_max_seats = st.number_input("最大座席数【モニタ有り】を入力して下さい  \nただし、13以下の数字にして下さい", min_value=2, max_value=13, value=seats['seatsnum'], step=1)
     if st.button("座席数の更新【モニタ有り】"):
         current_date = datetime.now(jst).date()
         if seats['seatsnum'] > new_max_seats:
