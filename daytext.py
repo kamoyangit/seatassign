@@ -61,6 +61,11 @@ def check_and_update_week(state, today):
     state["last_update"] = today
     return state
 
+# 初期化状態を記録
+@st.cache_data
+def is_initialized():
+    return False  # 初回起動時のみFalseを返す
+
 app_state = load_state()
 arrays = app_state["arrays"]
 current_week = app_state["current_week"]
@@ -73,10 +78,17 @@ japan_time = utc_now.astimezone(japan_tz)
 today = japan_time.date()
 # --------------------
 # 初回ロード時に更新を確認
-if "initial_load" not in st.session_state:
-    st.session_state.initial_load = True
+# if "initial_load" not in st.session_state:
+#     st.session_state.initial_load = True
+#     app_state = check_and_update_week(app_state, today)
+#     save_state(app_state)
+# 初期化フラグを確認
+if not is_initialized():
+    # 初期化処理を実行
     app_state = check_and_update_week(app_state, today)
     save_state(app_state)
+    # キャッシュを更新して初期化済みを記録
+    is_initialized = lambda: True
 # --------------------
 # 表示内容
 # current_week = app_state["current_week"]
