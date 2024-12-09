@@ -12,5 +12,6 @@ jobs:
 
     steps:
       - name: Send HTTP GET request
-        run: curl -X GET "https://kamoyan-seatassign.streamlit.app/"
+        run: curl -X POST "https://kamoyan-seatassign.streamlit.app/" -d "password=$PASS_WD" -c cookies.txt
+
 
