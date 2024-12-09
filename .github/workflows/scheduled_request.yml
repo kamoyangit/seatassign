@@ -1,6 +1,7 @@
 name: Daily URL Access
 
 on:
+  workflow_dispatch:  # 手動トリガー
   schedule:
     # 毎日18:00 (UTC) に実行
     - cron: "0 18 * * *"
