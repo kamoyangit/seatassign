@@ -2,3 +2,5 @@ venv/
 Streamlit.code-workspace
 .decontainer/
 __pycache__/
+app_sate.json
+seats.pkl
