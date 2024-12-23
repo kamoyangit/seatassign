@@ -52,6 +52,7 @@ def save_state(state):
         json.dump(state_copy, f, indent=4)
 
 def load_state():
+    global EXIST_FLAG
     if os.path.exists(STATE_FILE):
         EXIST_FLAG = True
         with open(STATE_FILE, 'r') as f:
