@@ -30,7 +30,7 @@ max_seats_nd = 4    # 10以下
 
 def main():
     # アプリのタイトル表示
-    st.title('座席ガチャ(V4.5.1)')
+    st.title('座席ガチャ(V4.5.2)')
 
     if check_password():
         seats = load_state()
@@ -95,9 +95,11 @@ def main():
             if available_seats:
                 assigned_seat = random.choice(available_seats)
                 seats['assigned'].append(assigned_seat)
+                # Quick Save
+                save_state(seats)
                 approve_button_disp(assigned_seat)
                 st.success(f'あなたの座席番号は ＜ {assigned_seat} ＞ です。')
-                save_state(seats)
+                # save_state(seats)
             else:
                 st.error('空きの座席はありません。')
 
@@ -112,9 +114,11 @@ def main():
             if available_seats_nd:
                 assigned_seat_nd = random.choice(available_seats_nd)
                 seats['assigned_nd'].append(assigned_seat_nd)
+                # Quick Save
+                save_state(seats)
                 approve_button_nodisp(assigned_seat_nd)
                 st.success(f'あなたの座席番号は ＜ {assigned_seat_nd} ＞ です。')
-                save_state(seats)
+                # save_state(seats)
             else:
                 st.error('空きの座席はありません。')
 
