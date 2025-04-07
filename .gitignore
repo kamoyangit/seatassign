@@ -4,3 +4,5 @@ Streamlit.code-workspace
 __pycache__/
 app_state.json
 seats.pkl
+AAA_2024.png
+.DS_Store
