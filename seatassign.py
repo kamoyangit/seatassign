@@ -13,6 +13,9 @@ from topic import topicToday_button_disp
 
 from daytext import get_on_duty, change_on_duty
 
+# 時刻保存・表示のため
+import os
+
 # 日本のタイムゾーンを指定
 jst = pytz.timezone('Asia/Tokyo')
 
@@ -28,9 +31,45 @@ rectParamsND = ('200,211,27,23', '168,211,27,23', '122,237,27,23', '167,362,27,2
 max_seats = 13
 max_seats_nd = 4    # 10以下
 
+# 時刻保存関数
+def log_startup_time_jst():
+    try:
+        # 日本標準時(JST)のタイムゾーンを取得
+        jst = pytz.timezone('Asia/Tokyo')
+        
+        # 現在時刻をUTCで取得し、JSTに変換
+        now_utc = datetime.now(pytz.utc)
+        now_jst = now_utc.astimezone(jst)
+        
+        # 日本時間でフォーマット
+        timestamp = now_jst.strftime("%Y-%m-%d %H:%M:%S (JST)")
+        
+        # ログディレクトリの確認と作成
+        log_dir = "logs"
+        if not os.path.exists(log_dir):
+            os.makedirs(log_dir)
+        
+        # ログファイルに追記
+        log_file = os.path.join(log_dir, "startup_log_jst.txt")
+        with open(log_file, "a", encoding="utf-8") as f:
+            f.write(f"アプリ起動: {timestamp}\n")
+            
+    except Exception as e:
+        st.error(f"ログ記録中にエラーが発生しました: {e}")
+
+# 保存時刻表示
+def log_display():
+    try:
+        with open("logs/startup_log_jst.txt", "r", encoding="utf-8") as f:
+            logs = f.read()
+        st.text_area("ログ内容", logs, height=200)
+    except FileNotFoundError:
+        st.warning("ログファイルが見つかりませんでした")
+
+
 def main():
     # アプリのタイトル表示
-    st.title('座席ガチャ(V4.5.5)')
+    st.title('座席ガチャ(V4.5.6)')
 
     if check_password():
         seats = load_state()
@@ -49,6 +88,8 @@ def main():
             seats = {'date': current_date, 'seatsnum': current_max_seats, 'assigned': [], 'seatsnum_nd': current_max_seats_nd, 'assigned_nd': []}
             # フェールセーフ
             save_state(seats)
+            # 時刻保存関数の実行
+            log_startup_time_jst()
         
         # ====================================================
         # 3つのカラムを作成
@@ -132,6 +173,10 @@ def main():
 
         st.divider()
         admin_main()
+
+        # 最初の保存時刻を表示
+        st.divider()
+        log_display()
 
 if __name__ == "__main__":
     main()
