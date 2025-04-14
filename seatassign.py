@@ -69,7 +69,7 @@ def log_display():
 
 def main():
     # アプリのタイトル表示
-    st.title('座席ガチャ(V4.5.6)')
+    st.title('座席ガチャ(V4.5.7)')
 
     if check_password():
         seats = load_state()

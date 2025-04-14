@@ -108,6 +108,8 @@ def check_and_update_week(state, today):
             # 前回の更新日と今日の日付が異なる週であれば、increment_weekを呼ぶ
             if last_update.isocalendar()[1] != today.isocalendar()[1]:
                 state = increment_week(state)  # 元の state を更新
+                # 登録日付を更新する（2025/04/14）
+                state['last_update'] = today
                 save_to_server(state)
             
         except ValueError as e:
