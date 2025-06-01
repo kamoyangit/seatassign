@@ -3,6 +3,12 @@ import pickle
 import os
 from PIL import Image
 
+# 新しい保存メソッド用
+import requests
+import base64
+
+GAS_BASE_URL = "https://script.google.com/macros/s/AKfycbzUx2ECkHeXnZbtcbJUxbTmsBBQVlkhaiBCInGXfVEQhjUTi0jJKgArIz1mZoqyIJBSuw/exec"  # 例: https://script.google.com/macros/s/AKf.../exec
+
 # パスワードの確認
 def check_password():
     # 環境変数を取得
@@ -45,17 +51,49 @@ def check_password_admin():
 
 # 状態のロード
 def load_state():
+    # ローカル保存用の古いコード
+    '''
     try:
         with open('seats.pkl', 'rb') as f:
             seats = pickle.load(f)
     except (EOFError, FileNotFoundError):
         seats = None
     return seats
+    '''
+    # 新しい保存メソッド用
+    # 環境変数を取得
+    SECRET_TOKEN = os.environ.get('PASS_KEY')
+    params = {"token": SECRET_TOKEN}
+    response = requests.get(GAS_BASE_URL, params={"token": SECRET_TOKEN})
+    if not response.ok:
+        st.error(f"HTTPエラー: {response.status_code}")
+        return None
+    if not response.text.isascii():
+        st.error(f"GAS応答にASCII以外が含まれています: {response.text}")
+        return None
+    if response.text in ["INVALID_TOKEN", "FILE_NOT_FOUND"]:
+        st.error(f"GASエラー: {response.text}")
+        return None
+    # 問題なければデコード
+    data = base64.b64decode(response.text)
+    seats = pickle.loads(data)
+    return seats
 
 # 状態のセーブ
 def save_state(seats):
+    # ローカル保存用の古いコード
+    '''
     with open('seats.pkl', 'wb') as f:
         pickle.dump(seats, f)
+    '''
+    # 新しい保存メソッド用
+    # 環境変数を取得
+    SECRET_TOKEN = os.environ.get('PASS_KEY')
+    data = pickle.dumps(seats)
+    encoded = base64.b64encode(data).decode("utf-8")
+    params = {"token": SECRET_TOKEN}
+    response = requests.post(GAS_BASE_URL, params=params, data=encoded)
+    return response.text
 
 # 画像ファイルのアップローダー
 def image_uploader():

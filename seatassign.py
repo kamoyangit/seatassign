@@ -52,7 +52,9 @@ def log_startup_time_jst():
         # ログファイルに追記
         log_file = os.path.join(log_dir, "startup_log_jst.txt")
         with open(log_file, "a", encoding="utf-8") as f:
-            f.write(f"アプリ起動: {timestamp}\n")
+            # f.write(f"アプリ起動: {timestamp}\n")
+            # データアクセスの記録
+            f.write(f"データアクセス: {timestamp}\n")
             
     except Exception as e:
         st.error(f"ログ記録中にエラーが発生しました: {e}")
@@ -69,7 +71,7 @@ def log_display():
 
 def main():
     # アプリのタイトル表示
-    st.title('座席ガチャ(V4.5.7)')
+    st.title('座席ガチャ(V4.6.0)')
 
     if check_password():
         seats = load_state()
